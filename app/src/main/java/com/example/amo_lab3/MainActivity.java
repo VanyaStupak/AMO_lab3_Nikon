@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -25,17 +27,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setBackgroundDrawable(
+                new ColorDrawable(Color.parseColor("#FFA424BA")));
+
         numberOfDots = findViewById(R.id.editTextNumber2);
-        double RX = 3.1;
-        xNLines = new double[30];
-        yNLines = new double[30];
-        xNLines[0] = 1.0;
-        xNLines[xNLines.length - 1] = 5;
-        yNLines[0] = 3.46;
-        double gap = 4.0 / (xNLines.length - 1);
+        double RX = 0.4;
+        xNLines = new double[9];
+        yNLines = new double[9];
+        xNLines[0] = 0;
+        xNLines[xNLines.length - 1] = 1;
+        yNLines[0] = 2;
+        double gap = 1.0 / (xNLines.length - 1);
         for (int i = 1; i < xNLines.length; i++) {
             xNLines[i] = xNLines[i - 1] + gap;
-            yNLines[i] = 10 * Math.log(2 * xNLines[i]) / (1 + xNLines[i]);
+            yNLines[i] = Math.pow(xNLines[i], 2) + 2 * Math.exp(xNLines[i]);
         }
         errors = new double[5];
         errorsX1 = new double[2];
@@ -54,65 +59,46 @@ public class MainActivity extends AppCompatActivity {
         fullArr(errorsX4, errorsY4);
         fullArr(errorsX5, errorsY5);
 
-        Function<Double, Double> newtonPolynomial1 = createNewtonPolynomial(errorsX1, errorsY1);
-        Function<Double, Double> newtonPolynomial2 = createNewtonPolynomial(errorsX2, errorsY2);
-        Function<Double, Double> newtonPolynomial3 = createNewtonPolynomial(errorsX3, errorsY3);
-        Function<Double, Double> newtonPolynomial4 = createNewtonPolynomial(errorsX4, errorsY4);
-        Function<Double, Double> newtonPolynomial5 = createNewtonPolynomial(errorsX5, errorsY5);
+        double lagrangePolynomial1 = lagrangeInterpolation(errorsX1, errorsY1, RX);
+        double lagrangePolynomial2 = lagrangeInterpolation(errorsX2, errorsY2,RX);
+        double lagrangePolynomial3 = lagrangeInterpolation(errorsX3, errorsY3,RX);
+        double lagrangePolynomial4 = lagrangeInterpolation(errorsX4, errorsY4,RX);
+        double lagrangePolynomial5 = lagrangeInterpolation(errorsX5, errorsY5,RX);
 
-        errors[0] = Math.abs(newtonPolynomial1.apply(RX) - (10 * Math.log(2 * RX) / (1 + RX)));
-        errors[1] = Math.abs(newtonPolynomial2.apply(RX) - (10 * Math.log(2 * RX) / (1 + RX)));
-        errors[2] = Math.abs(newtonPolynomial3.apply(RX) - (10 * Math.log(2 * RX) / (1 + RX)));
-        errors[3] = Math.abs(newtonPolynomial4.apply(RX) - (10 * Math.log(2 * RX) / (1 + RX)));
-        errors[4] = Math.abs(newtonPolynomial5.apply(RX) - (10 * Math.log(2 * RX) / (1 + RX)));
+        errors[0] = Math.abs(lagrangePolynomial1 - (Math.pow(RX, 2) + 2 * Math.exp(RX)));
+        errors[1] = Math.abs(lagrangePolynomial2  - (Math.pow(RX, 2) + 2 * Math.exp(RX)));
+        errors[2] = Math.abs(lagrangePolynomial3 - (Math.pow(RX, 2) + 2 * Math.exp(RX)));
+        errors[3] = Math.abs(lagrangePolynomial4 - (Math.pow(RX, 2) + 2 * Math.exp(RX)));
+        errors[4] = Math.abs(lagrangePolynomial5 - (Math.pow(RX, 2) + 2 * Math.exp(RX)));
 
 
     }
 
-    public static double calculateDividedDifferences(double[] x, double[] y, int k) {
+    public static double lagrangeInterpolation(double[] x, double[] y, double x_int) {
         double result = 0;
-        for (int j = 0; j <= k; j++) {
-            double mul = 1;
-            for (int i = 0; i <= k; i++) {
-                if (j != i) {
-                    mul *= (x[j] - x[i]);
+        for (int i = 0; i < x.length; i++) {
+            double term = y[i];
+            for (int j = 0; j < x.length; j++) {
+                if (i != j) {
+                    term *= (x_int - x[j]) / (x[i] - x[j]);
                 }
             }
-            result += y[j] / mul;
+            result += term;
         }
         return result;
-    }
-
-    public static Function<Double, Double> createNewtonPolynomial(double[] x, double[] y) {
-        double[] divDiff = new double[x.length - 1];
-        for (int i = 1; i < x.length; i++) {
-            divDiff[i - 1] = calculateDividedDifferences(x, y, i);
-        }
-        Function<Double, Double> newtonPolynomial = (xVal) -> {
-            double result = y[0];
-            for (int k = 1; k < x.length; k++) {
-                double mul = 1;
-                for (int j = 0; j < k; j++) {
-                    mul *= (xVal - x[j]);
-                }
-                result += divDiff[k - 1] * mul;
-            }
-            return result;
-        };
-        return newtonPolynomial;
     }
 
 
     public void makeGraphs(View v) {
         x = new double[Integer.parseInt(String.valueOf(numberOfDots.getText()))];
         y = new double[x.length];
-        x[0] = 1.0;
-        x[x.length - 1] = 5;
-        y[0] = 3.46;
-        double gap = 4.0 / (x.length - 1);
+        x[0] = 0;
+        x[x.length - 1] = 1;
+        y[0] = 2;
+        double gap = 1.0 / (x.length - 1);
         for (int i = 1; i < x.length; i++) {
             x[i] = x[i - 1] + gap;
-            y[i] = (10 * Math.log(2 * x[i])) / (1 + x[i]);
+            y[i] = (Math.pow(x[i], 2) + 2 * Math.exp(x[i]));
         }
         showInter(v);
         showInterLines(v);
@@ -121,31 +107,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showInter(View v) {
-        Function<Double, Double> newtonPolynomial = createNewtonPolynomial(x, y);
         xN = new double[x.length];
         yN = new double[y.length];
         for (int i = 0; i < x.length; i++) {
             xN[i] = x[i];
-            yN[i] = newtonPolynomial.apply(x[i]);
+            yN[i] = lagrangeInterpolation(x,y,x[i]);
         }
 
     }
 
     public void showInterLines(View v) {
-        Function<Double, Double> newtonPolynomial = createNewtonPolynomial(xNLines, yNLines);
-        xInter = new double[30];
-        yInter = new double[30];
+        xInter = new double[9];
+        yInter = new double[9];
         for (int i = 0; i < xNLines.length; i++) {
             xInter[i] = xNLines[i];
-            yInter[i] = newtonPolynomial.apply(xNLines[i]);
+            yInter[i] = lagrangeInterpolation(xNLines,yNLines,xNLines[i]);
         }
     }
 
     public void fullArr(double[] ex, double[] ey) {
-        double gap = 4.0 / (ex.length - 1);
+        double gap = 1.0 / (ex.length - 1);
         for (int i = 1; i < ex.length; i++) {
             ex[i] = ex[i - 1] + gap;
-            ey[i] = (10 * Math.log(2 * ex[i])) / (1 + ex[i]);
+            ey[i] = (Math.pow(ex[i], 2) + 2 * Math.exp(ex[i]));
         }
     }
 

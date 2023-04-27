@@ -34,13 +34,13 @@ public class Graphs extends AppCompatActivity {
 
         double[] funcLinesX = new double[50];
         double[] funcLinesY = new double[50];
-        funcLinesX[0] = 1.0;
-        funcLinesY[funcLinesY.length - 1] = 5;
-        funcLinesY[0] = 3.46;
-        double gap = 4.0 / (funcLinesX.length - 1);
+        funcLinesX[0] = 0;
+        funcLinesY[funcLinesY.length - 1] = 1;
+        funcLinesY[0] = 2;
+        double gap = 1.0 / (funcLinesX.length - 1);
         for (int i = 1; i < funcLinesX.length; i++) {
             funcLinesX[i] = funcLinesX[i - 1] + gap;
-            funcLinesY[i] = (10 * Math.log(2 * funcLinesX[i])) / (1 + funcLinesX[i]);
+            funcLinesY[i] = ((Math.pow(funcLinesX[i], 2) + 2 * Math.exp(funcLinesX[i])));
         }
         lineEntries1_lines = new ArrayList<Entry>();
         lineEntries1 = new ArrayList<Entry>();
