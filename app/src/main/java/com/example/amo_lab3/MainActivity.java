@@ -9,9 +9,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
-
-import java.util.Arrays;
 import java.util.function.Function;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,19 +24,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setBackgroundDrawable(
-                new ColorDrawable(Color.parseColor("#FF081451")));
+                new ColorDrawable(Color.parseColor("#4CAF50")));
         setContentView(R.layout.activity_main);
         numberOfDots = findViewById(R.id.editTextNumber2);
-        double RX = 1.4;
-        xNLines = new double[10];
-        yNLines = new double[10];
-        xNLines[0] = 1.0;
-        xNLines[xNLines.length - 1] = 3;
-        yNLines[0] = 0.135;
-        double gap = 2.0 / (xNLines.length - 1);
+        double RX = 1.3;
+        xNLines = new double[34];
+        yNLines = new double[34];
+        xNLines[0] = 3.0;
+        xNLines[xNLines.length - 1] = 6.0;
+        yNLines[0] = -0.973;
+        double gap = 3.0 / (xNLines.length - 1);
         for (int i = 1; i < xNLines.length; i++) {
             xNLines[i] = xNLines[i - 1] + gap;
-            yNLines[i] = Math.exp(-(xNLines[i]+1)/xNLines[i]);
+            yNLines[i] = Math.cos(xNLines[i]+Math.exp(Math.cos(xNLines[i])));
         }
         errors = new double[5];
         errorsX1 = new double[2];
@@ -64,11 +61,11 @@ public class MainActivity extends AppCompatActivity {
         Function<Double, Double> newtonPolynomial4 = createNewtonPolynomial(errorsX4, errorsY4);
         Function<Double, Double> newtonPolynomial5 = createNewtonPolynomial(errorsX5, errorsY5);
 
-        errors[0] = Math.abs(newtonPolynomial1.apply(RX) - (Math.exp(-(RX+1)/RX)));
-        errors[1] = Math.abs(newtonPolynomial2.apply(RX) - (Math.exp(-(RX+1)/RX)));
-        errors[2] = Math.abs(newtonPolynomial3.apply(RX) - (Math.exp(-(RX+1)/RX)));
-        errors[3] = Math.abs(newtonPolynomial4.apply(RX) - (Math.exp(-(RX+1)/RX)));
-        errors[4] = Math.abs(newtonPolynomial5.apply(RX) - (Math.exp(-(RX+1)/RX)));
+        errors[0] = Math.abs(newtonPolynomial1.apply(RX) - (Math.cos(RX+Math.exp(Math.cos(RX)))));
+        errors[1] = Math.abs(newtonPolynomial2.apply(RX) - (Math.cos(RX+Math.exp(Math.cos(RX)))));
+        errors[2] = Math.abs(newtonPolynomial3.apply(RX) - (Math.cos(RX+Math.exp(Math.cos(RX)))));
+        errors[3] = Math.abs(newtonPolynomial4.apply(RX) - (Math.cos(RX+Math.exp(Math.cos(RX)))));
+        errors[4] = Math.abs(newtonPolynomial5.apply(RX) - (Math.cos(RX+Math.exp(Math.cos(RX)))));
 
 
     }
@@ -110,13 +107,13 @@ public class MainActivity extends AppCompatActivity {
     public void makeGraphs(View v) {
         x = new double[Integer.parseInt(String.valueOf(numberOfDots.getText()))];
         y = new double[x.length];
-        x[0] = 1.0;
-        x[x.length - 1] = 3.0;
-        y[0] = 0.135;
-        double gap = 2.0 / (x.length - 1);
+        x[0] = 3.0;
+        x[x.length - 1] = 6.0;
+        y[0] = -0.973;
+        double gap = 3.0 / (x.length - 1);
         for (int i = 1; i < x.length; i++) {
             x[i] = x[i - 1] + gap;
-            y[i] = Math.exp(-(x[i]+1)/x[i]);
+            y[i] = Math.cos(x[i]+Math.exp(Math.cos(x[i])));
         }
         showInter(v);
         showInterLines(v);
@@ -137,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void showInterLines(View v) {
         Function<Double, Double> newtonPolynomial = createNewtonPolynomial(xNLines, yNLines);
-        xInter = new double[10];
-        yInter = new double[10];
+        xInter = new double[34];
+        yInter = new double[34];
         for (int i = 0; i < xNLines.length; i++) {
             xInter[i] = xNLines[i];
             yInter[i] = newtonPolynomial.apply(xNLines[i]);
@@ -146,10 +143,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void fullArr(double[] ex, double[] ey) {
-        double gap = 2.0 / (ex.length - 1);
+        double gap = 3.0 / (ex.length - 1);
         for (int i = 1; i < ex.length; i++) {
             ex[i] = ex[i - 1] + gap;
-            ey[i] = Math.exp(-(ex[i]+1)/ex[i]);
+            ey[i] = Math.cos(ex[i]+Math.exp(Math.cos(ex[i])));
         }
     }
 

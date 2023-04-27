@@ -55,7 +55,7 @@
         android:layout_height="54dp"
         android:onClick="makeGraphs"
         android:text="Показати графіки"
-        android:backgroundTint="#081451"
+        android:backgroundTint="#4CAF50"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
