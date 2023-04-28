@@ -24,19 +24,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setBackgroundDrawable(
-                new ColorDrawable(Color.parseColor("#4CAF50")));
+                new ColorDrawable(Color.parseColor("#FFCF1306")));
         setContentView(R.layout.activity_main);
         numberOfDots = findViewById(R.id.editTextNumber2);
-        double RX = 1.3;
-        xNLines = new double[34];
-        yNLines = new double[34];
-        xNLines[0] = 3.0;
-        xNLines[xNLines.length - 1] = 6.0;
-        yNLines[0] = -0.973;
-        double gap = 3.0 / (xNLines.length - 1);
+        double RX = 0.4;
+        xNLines = new double[25];
+        yNLines = new double[25];
+        xNLines[0] = 0;
+        xNLines[xNLines.length - 1] = 1.0;
+        yNLines[0] = 1.0;
+        double gap = 1.0 / (xNLines.length - 1);
         for (int i = 1; i < xNLines.length; i++) {
             xNLines[i] = xNLines[i - 1] + gap;
-            yNLines[i] = Math.cos(xNLines[i]+Math.exp(Math.cos(xNLines[i])));
+            yNLines[i] = Math.pow(Math.cos(xNLines[i]),2);
         }
         errors = new double[5];
         errorsX1 = new double[2];
@@ -55,65 +55,62 @@ public class MainActivity extends AppCompatActivity {
         fullArr(errorsX4, errorsY4);
         fullArr(errorsX5, errorsY5);
 
-        Function<Double, Double> newtonPolynomial1 = createNewtonPolynomial(errorsX1, errorsY1);
-        Function<Double, Double> newtonPolynomial2 = createNewtonPolynomial(errorsX2, errorsY2);
-        Function<Double, Double> newtonPolynomial3 = createNewtonPolynomial(errorsX3, errorsY3);
-        Function<Double, Double> newtonPolynomial4 = createNewtonPolynomial(errorsX4, errorsY4);
-        Function<Double, Double> newtonPolynomial5 = createNewtonPolynomial(errorsX5, errorsY5);
+         double aitkenInter1 = aitkenInterpolation(errorsX1, errorsY1,RX);
+         double aitkenInter2 = aitkenInterpolation(errorsX2, errorsY2,RX);
+         double aitkenInter3 = aitkenInterpolation(errorsX3, errorsY3,RX);
+         double aitkenInter4 = aitkenInterpolation(errorsX4, errorsY4,RX);
+         double aitkenInter5 = aitkenInterpolation(errorsX5, errorsY5,RX);
 
-        errors[0] = Math.abs(newtonPolynomial1.apply(RX) - (Math.cos(RX+Math.exp(Math.cos(RX)))));
-        errors[1] = Math.abs(newtonPolynomial2.apply(RX) - (Math.cos(RX+Math.exp(Math.cos(RX)))));
-        errors[2] = Math.abs(newtonPolynomial3.apply(RX) - (Math.cos(RX+Math.exp(Math.cos(RX)))));
-        errors[3] = Math.abs(newtonPolynomial4.apply(RX) - (Math.cos(RX+Math.exp(Math.cos(RX)))));
-        errors[4] = Math.abs(newtonPolynomial5.apply(RX) - (Math.cos(RX+Math.exp(Math.cos(RX)))));
+        errors[0] = Math.abs(aitkenInter1 - (Math.pow(Math.cos(RX),2)));
+        errors[1] = Math.abs(aitkenInter2 - (Math.pow(Math.cos(RX),2)));
+        errors[2] = Math.abs(aitkenInter3 - (Math.pow(Math.cos(RX),2)));
+        errors[3] = Math.abs(aitkenInter4 - (Math.pow(Math.cos(RX),2)));
+        errors[4] = Math.abs(aitkenInter5 - (Math.pow(Math.cos(RX),2)));
 
 
     }
 
-    public static double calculateDividedDifferences(double[] x, double[] y, int k) {
-        double result = 0;
-        for (int j = 0; j <= k; j++) {
-            double mul = 1;
-            for (int i = 0; i <= k; i++) {
-                if (j != i) {
-                    mul *= (x[j] - x[i]);
-                }
-            }
-            result += y[j] / mul;
-        }
-        return result;
-    }
+    public static double aitkenInterpolation(double[] x, double[] y, double xInt) {
+        double[][] f = new double[x.length][x.length];
 
-    public static Function<Double, Double> createNewtonPolynomial(double[] x, double[] y) {
-        double[] divDiff = new double[x.length - 1];
-        for (int i = 1; i < x.length; i++) {
-            divDiff[i - 1] = calculateDividedDifferences(x, y, i);
+        // заповнення першого стовпця таблиці
+        for (int i = 0; i < x.length; i++) {
+            f[i][0] = y[i];
         }
-        Function<Double, Double> newtonPolynomial = (xVal) -> {
-            double result = y[0];
-            for (int k = 1; k < x.length; k++) {
-                double mul = 1;
-                for (int j = 0; j < k; j++) {
-                    mul *= (xVal - x[j]);
-                }
-                result += divDiff[k - 1] * mul;
+
+        // побудова таблиці
+        for (int j = 1; j < x.length; j++) {
+            for (int i = 0; i < x.length - j; i++) {
+                f[i][j] = ((xInt - x[i + j]) * f[i][j - 1] - (xInt - x[i]) * f[i + 1][j - 1]) / (x[i] - x[i + j]);
             }
-            return result;
-        };
-        return newtonPolynomial;
+        }
+
+        // пошук стовпця з найдешевшою різницею
+        int col = -1;
+        double minDiff = Double.POSITIVE_INFINITY;
+        for (int j = 1; j < x.length; j++) {
+            double diff = Math.abs(f[j][j] - f[j - 1][j - 1]);
+            if (diff < minDiff) {
+                col = j;
+                minDiff = diff;
+            }
+        }
+
+        // результат - значення функції в точці xInt
+        return f[0][col];
     }
 
 
     public void makeGraphs(View v) {
         x = new double[Integer.parseInt(String.valueOf(numberOfDots.getText()))];
         y = new double[x.length];
-        x[0] = 3.0;
-        x[x.length - 1] = 6.0;
-        y[0] = -0.973;
-        double gap = 3.0 / (x.length - 1);
+        x[0] = 0;
+        x[x.length - 1] = 1.0;
+        y[0] = 1.0;
+        double gap = 1.0 / (x.length - 1);
         for (int i = 1; i < x.length; i++) {
             x[i] = x[i - 1] + gap;
-            y[i] = Math.cos(x[i]+Math.exp(Math.cos(x[i])));
+            y[i] = Math.pow(Math.cos(x[i]),2);
         }
         showInter(v);
         showInterLines(v);
@@ -122,31 +119,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showInter(View v) {
-        Function<Double, Double> newtonPolynomial = createNewtonPolynomial(x, y);
         xN = new double[x.length];
         yN = new double[y.length];
         for (int i = 0; i < x.length; i++) {
             xN[i] = x[i];
-            yN[i] = newtonPolynomial.apply(x[i]);
+            yN[i] = aitkenInterpolation(x,y,x[i]);
         }
 
     }
 
     public void showInterLines(View v) {
-        Function<Double, Double> newtonPolynomial = createNewtonPolynomial(xNLines, yNLines);
-        xInter = new double[34];
-        yInter = new double[34];
+        xInter = new double[25];
+        yInter = new double[25];
         for (int i = 0; i < xNLines.length; i++) {
             xInter[i] = xNLines[i];
-            yInter[i] = newtonPolynomial.apply(xNLines[i]);
+            yInter[i] = aitkenInterpolation(x,y,xNLines[i]);
         }
     }
 
     public void fullArr(double[] ex, double[] ey) {
-        double gap = 3.0 / (ex.length - 1);
+        double gap = 1.0 / (ex.length - 1);
         for (int i = 1; i < ex.length; i++) {
             ex[i] = ex[i - 1] + gap;
-            ey[i] = Math.cos(ex[i]+Math.exp(Math.cos(ex[i])));
+            ey[i] = Math.pow(Math.cos(ex[i]),2);
         }
     }
 
