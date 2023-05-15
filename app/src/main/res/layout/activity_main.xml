@@ -48,24 +48,24 @@
 
     <Button
         android:id="@+id/button"
-        android:layout_width="212dp"
+        android:layout_width="match_parent"
         android:layout_height="54dp"
-        android:backgroundTint="#CF1306"
+        android:backgroundTint="#E10DC5"
         android:onClick="makeGraphs"
         android:text="Показати графіки"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextNumber2"
-        app:layout_constraintVertical_bias="0.082" />
+        app:layout_constraintVertical_bias="0.02" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Схема Ейткена"
+        android:text="Інтерполяційний многочлен Лагранжа"
         android:textColor="@color/black"
         android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"

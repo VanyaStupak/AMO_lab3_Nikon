@@ -9,6 +9,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import java.util.function.Function;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,19 +26,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setBackgroundDrawable(
-                new ColorDrawable(Color.parseColor("#FFCF1306")));
+                new ColorDrawable(Color.parseColor("#E10DC5")));
         setContentView(R.layout.activity_main);
         numberOfDots = findViewById(R.id.editTextNumber2);
-        double RX = 0.4;
+        double RX = 1.3;
         xNLines = new double[25];
         yNLines = new double[25];
         xNLines[0] = 0;
-        xNLines[xNLines.length - 1] = 1.0;
-        yNLines[0] = 1.0;
-        double gap = 1.0 / (xNLines.length - 1);
+        xNLines[xNLines.length - 1] = 2.0;
+        yNLines[0] = 0;
+        double gap = 2.0 / (xNLines.length - 1);
         for (int i = 1; i < xNLines.length; i++) {
             xNLines[i] = xNLines[i - 1] + gap;
-            yNLines[i] = Math.pow(Math.cos(xNLines[i]),2);
+            yNLines[i] = Math.sin(Math.pow(xNLines[i],2));
         }
         errors = new double[5];
         errorsX1 = new double[2];
@@ -55,49 +57,36 @@ public class MainActivity extends AppCompatActivity {
         fullArr(errorsX4, errorsY4);
         fullArr(errorsX5, errorsY5);
 
-         double aitkenInter1 = aitkenInterpolation(errorsX1, errorsY1,RX);
-         double aitkenInter2 = aitkenInterpolation(errorsX2, errorsY2,RX);
-         double aitkenInter3 = aitkenInterpolation(errorsX3, errorsY3,RX);
-         double aitkenInter4 = aitkenInterpolation(errorsX4, errorsY4,RX);
-         double aitkenInter5 = aitkenInterpolation(errorsX5, errorsY5,RX);
+         double lp1 = lagrangePolynomial(errorsX1, errorsY1,RX);
+         double lp2 = lagrangePolynomial(errorsX2, errorsY2,RX);
+         double lp3 = lagrangePolynomial(errorsX3, errorsY3,RX);
+         double lp4 = lagrangePolynomial(errorsX4, errorsY4,RX);
+         double lp5 = lagrangePolynomial(errorsX5, errorsY5,RX);
 
-        errors[0] = Math.abs(aitkenInter1 - (Math.pow(Math.cos(RX),2)));
-        errors[1] = Math.abs(aitkenInter2 - (Math.pow(Math.cos(RX),2)));
-        errors[2] = Math.abs(aitkenInter3 - (Math.pow(Math.cos(RX),2)));
-        errors[3] = Math.abs(aitkenInter4 - (Math.pow(Math.cos(RX),2)));
-        errors[4] = Math.abs(aitkenInter5 - (Math.pow(Math.cos(RX),2)));
+        errors[0] = Math.abs(lp1 - (Math.sin(Math.pow(RX,2))));
+        errors[1] = Math.abs(lp2 - (Math.sin(Math.pow(RX,2))));
+        errors[2] = Math.abs(lp3 - (Math.sin(Math.pow(RX,2))));
+        errors[3] = Math.abs(lp4 - (Math.sin(Math.pow(RX,2))));
+        errors[4] = Math.abs(lp5 - (Math.sin(Math.pow(RX,2))));
 
 
     }
 
-    public static double aitkenInterpolation(double[] x, double[] y, double xInt) {
-        double[][] f = new double[x.length][x.length];
+    public double lagrangePolynomial(double[] x, double[] y, double t) {
+        int n = x.length;
+        double p = 0;
 
-        // заповнення першого стовпця таблиці
-        for (int i = 0; i < x.length; i++) {
-            f[i][0] = y[i];
-        }
-
-        // побудова таблиці
-        for (int j = 1; j < x.length; j++) {
-            for (int i = 0; i < x.length - j; i++) {
-                f[i][j] = ((xInt - x[i + j]) * f[i][j - 1] - (xInt - x[i]) * f[i + 1][j - 1]) / (x[i] - x[i + j]);
+        for (int j = 0; j < n; j++) {
+            double L = 1;
+            for (int i = 0; i < n; i++) {
+                if (i != j) {
+                    L *= (t - x[i]) / (x[j] - x[i]);
+                }
             }
+            p += y[j] * L;
         }
 
-        // пошук стовпця з найдешевшою різницею
-        int col = -1;
-        double minDiff = Double.POSITIVE_INFINITY;
-        for (int j = 1; j < x.length; j++) {
-            double diff = Math.abs(f[j][j] - f[j - 1][j - 1]);
-            if (diff < minDiff) {
-                col = j;
-                minDiff = diff;
-            }
-        }
-
-        // результат - значення функції в точці xInt
-        return f[0][col];
+        return p;
     }
 
 
@@ -105,17 +94,23 @@ public class MainActivity extends AppCompatActivity {
         x = new double[Integer.parseInt(String.valueOf(numberOfDots.getText()))];
         y = new double[x.length];
         x[0] = 0;
-        x[x.length - 1] = 1.0;
-        y[0] = 1.0;
-        double gap = 1.0 / (x.length - 1);
+        x[x.length - 1] = 2.0;
+        y[0] = 0;
+        double gap = 2.0 / (x.length - 1);
         for (int i = 1; i < x.length; i++) {
             x[i] = x[i - 1] + gap;
-            y[i] = Math.pow(Math.cos(x[i]),2);
+            y[i] = Math.sin(Math.pow(x[i],2));
         }
         showInter(v);
         showInterLines(v);
-        Intent intent = new Intent(this, Graphs.class);
-        startActivity(intent);
+        if(x.length<2) {
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "Кількість точок має бути більше за 1", Toast.LENGTH_SHORT);
+            toast.show();
+        }else {
+            Intent intent = new Intent(this, Graphs.class);
+            startActivity(intent);
+        }
     }
 
     public void showInter(View v) {
@@ -123,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         yN = new double[y.length];
         for (int i = 0; i < x.length; i++) {
             xN[i] = x[i];
-            yN[i] = aitkenInterpolation(x,y,x[i]);
+            yN[i] = lagrangePolynomial(x,y,x[i]);
         }
 
     }
@@ -133,15 +128,15 @@ public class MainActivity extends AppCompatActivity {
         yInter = new double[25];
         for (int i = 0; i < xNLines.length; i++) {
             xInter[i] = xNLines[i];
-            yInter[i] = aitkenInterpolation(x,y,xNLines[i]);
+            yInter[i] = lagrangePolynomial(x,y,xNLines[i]);
         }
     }
 
     public void fullArr(double[] ex, double[] ey) {
-        double gap = 1.0 / (ex.length - 1);
+        double gap = 2.0 / (ex.length - 1);
         for (int i = 1; i < ex.length; i++) {
             ex[i] = ex[i - 1] + gap;
-            ey[i] = Math.pow(Math.cos(ex[i]),2);
+            ey[i] = Math.sin(Math.pow(ex[i],2));
         }
     }
 
