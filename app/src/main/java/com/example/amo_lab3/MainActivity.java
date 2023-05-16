@@ -26,19 +26,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setBackgroundDrawable(
-                new ColorDrawable(Color.parseColor("#E10DC5")));
+                new ColorDrawable(Color.parseColor("#EC920D")));
         setContentView(R.layout.activity_main);
         numberOfDots = findViewById(R.id.editTextNumber2);
         double RX = 1.3;
-        xNLines = new double[25];
-        yNLines = new double[25];
-        xNLines[0] = 0;
-        xNLines[xNLines.length - 1] = 2.0;
-        yNLines[0] = 0;
-        double gap = 2.0 / (xNLines.length - 1);
+        xNLines = new double[34];
+        yNLines = new double[34];
+        xNLines[0] = 3.0;
+        xNLines[xNLines.length - 1] = 6.0;
+        yNLines[0] = -0.973;
+        double gap = 3.0 / (xNLines.length - 1);
         for (int i = 1; i < xNLines.length; i++) {
             xNLines[i] = xNLines[i - 1] + gap;
-            yNLines[i] = Math.sin(Math.pow(xNLines[i],2));
+            yNLines[i] = Math.cos(xNLines[i]+Math.exp(Math.cos(xNLines[i])));
         }
         errors = new double[5];
         errorsX1 = new double[2];
@@ -57,49 +57,58 @@ public class MainActivity extends AppCompatActivity {
         fullArr(errorsX4, errorsY4);
         fullArr(errorsX5, errorsY5);
 
-         double lp1 = lagrangePolynomial(errorsX1, errorsY1,RX);
-         double lp2 = lagrangePolynomial(errorsX2, errorsY2,RX);
-         double lp3 = lagrangePolynomial(errorsX3, errorsY3,RX);
-         double lp4 = lagrangePolynomial(errorsX4, errorsY4,RX);
-         double lp5 = lagrangePolynomial(errorsX5, errorsY5,RX);
+         double newton1 = newtonInterpolation(errorsX1, errorsY1,RX);
+         double newton2 = newtonInterpolation(errorsX2, errorsY2,RX);
+         double newton3 = newtonInterpolation(errorsX3, errorsY3,RX);
+         double newton4 = newtonInterpolation(errorsX4, errorsY4,RX);
+         double newton5 = newtonInterpolation(errorsX5, errorsY5,RX);
 
-        errors[0] = Math.abs(lp1 - (Math.sin(Math.pow(RX,2))));
-        errors[1] = Math.abs(lp2 - (Math.sin(Math.pow(RX,2))));
-        errors[2] = Math.abs(lp3 - (Math.sin(Math.pow(RX,2))));
-        errors[3] = Math.abs(lp4 - (Math.sin(Math.pow(RX,2))));
-        errors[4] = Math.abs(lp5 - (Math.sin(Math.pow(RX,2))));
+        errors[0] = Math.abs(newton1 - (Math.cos(RX+Math.exp(Math.cos(RX)))));
+        errors[1] = Math.abs(newton2 - (Math.cos(RX+Math.exp(Math.cos(RX)))));
+        errors[2] = Math.abs(newton3 - (Math.cos(RX+Math.exp(Math.cos(RX)))));
+        errors[3] = Math.abs(newton4 - (Math.cos(RX+Math.exp(Math.cos(RX)))));
+        errors[4] = Math.abs(newton5 - (Math.cos(RX+Math.exp(Math.cos(RX)))));
 
 
     }
+public static double newtonInterpolation(double[] xValues, double[] yValues, double x) {
+    int n = xValues.length;
+    double[][] f = new double[n][n];
 
-    public double lagrangePolynomial(double[] x, double[] y, double t) {
-        int n = x.length;
-        double p = 0;
+    for (int i = 0; i < n; i++) {
+        f[i][0] = yValues[i];
+    }
 
-        for (int j = 0; j < n; j++) {
-            double L = 1;
-            for (int i = 0; i < n; i++) {
-                if (i != j) {
-                    L *= (t - x[i]) / (x[j] - x[i]);
-                }
-            }
-            p += y[j] * L;
+    for (int j = 1; j < n; j++) {
+        for (int i = 0; i < n - j; i++) {
+            f[i][j] = (f[i + 1][j - 1] - f[i][j - 1]) / (xValues[i + j] - xValues[i]);
         }
-
-        return p;
     }
+
+    double y = 0.0;
+    for (int i = 0; i < n; i++) {
+        double prod = f[0][i];
+        for (int j = 0; j < i; j++) {
+            prod *= (x - xValues[j]);
+        }
+        y += prod;
+    }
+
+    return y;
+}
+
 
 
     public void makeGraphs(View v) {
         x = new double[Integer.parseInt(String.valueOf(numberOfDots.getText()))];
         y = new double[x.length];
-        x[0] = 0;
-        x[x.length - 1] = 2.0;
-        y[0] = 0;
-        double gap = 2.0 / (x.length - 1);
+        x[0] = 3.0;
+        x[x.length - 1] = 6.0;
+        y[0] = -0.973;
+        double gap = 3.0 / (x.length - 1);
         for (int i = 1; i < x.length; i++) {
             x[i] = x[i - 1] + gap;
-            y[i] = Math.sin(Math.pow(x[i],2));
+            y[i] = Math.cos(x[i]+Math.exp(Math.cos(x[i])));
         }
         showInter(v);
         showInterLines(v);
@@ -118,25 +127,25 @@ public class MainActivity extends AppCompatActivity {
         yN = new double[y.length];
         for (int i = 0; i < x.length; i++) {
             xN[i] = x[i];
-            yN[i] = lagrangePolynomial(x,y,x[i]);
+            yN[i] = newtonInterpolation(x,y,x[i]);
         }
 
     }
 
     public void showInterLines(View v) {
-        xInter = new double[25];
-        yInter = new double[25];
+        xInter = new double[34];
+        yInter = new double[34];
         for (int i = 0; i < xNLines.length; i++) {
             xInter[i] = xNLines[i];
-            yInter[i] = lagrangePolynomial(x,y,xNLines[i]);
+            yInter[i] = newtonInterpolation(x,y,xNLines[i]);
         }
     }
 
     public void fullArr(double[] ex, double[] ey) {
-        double gap = 2.0 / (ex.length - 1);
+        double gap = 3.0 / (ex.length - 1);
         for (int i = 1; i < ex.length; i++) {
             ex[i] = ex[i - 1] + gap;
-            ey[i] = Math.sin(Math.pow(ex[i],2));
+            ey[i] = Math.cos(ex[i]+Math.exp(Math.cos(ex[i])));
         }
     }
 

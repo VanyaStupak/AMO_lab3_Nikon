@@ -24,48 +24,48 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="249dp"
-        android:layout_height="66dp"
+        android:layout_width="407dp"
+        android:layout_height="69dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
         app:layout_constraintVertical_bias="0.04"
-        app:srcCompat="@drawable/img" />
+        app:srcCompat="@drawable/img_1" />
 
     <EditText
         android:id="@+id/editTextNumber2"
-        android:layout_width="133dp"
-        android:layout_height="49dp"
-        android:layout_marginTop="12dp"
+        android:layout_width="71dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/my_border"
         android:ems="10"
+        android:gravity="center"
         android:inputType="number"
         app:layout_constraintEnd_toEndOf="@+id/textView"
-        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="@+id/textView"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <Button
         android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:backgroundTint="#E10DC5"
+        android:layout_width="133dp"
+        android:layout_height="111dp"
+        android:backgroundTint="#EC920D"
         android:onClick="makeGraphs"
         android:text="Показати графіки"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextNumber2"
-        app:layout_constraintVertical_bias="0.02" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Інтерполяційний многочлен Лагранжа"
+        android:text="Інтерполяційний многочлен Ньютона"
         android:textColor="@color/black"
         android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"

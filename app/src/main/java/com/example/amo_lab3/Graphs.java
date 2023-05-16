@@ -34,13 +34,13 @@ public class Graphs extends AppCompatActivity {
 
         double[] funcLinesX = new double[50];
         double[] funcLinesY = new double[50];
-        funcLinesX[0] = 0.0;
-        funcLinesX[funcLinesX.length - 1] = 2.0;
-        funcLinesY[0] = 0;
-        double gap = 2.0 / (funcLinesX.length - 1);
+        funcLinesX[0] = 3.0;
+        funcLinesX[funcLinesX.length - 1] = 6.0;
+        funcLinesY[0] = -0.973;
+        double gap = 3.0 / (funcLinesX.length - 1);
         for (int i = 1; i < funcLinesX.length; i++) {
             funcLinesX[i] = funcLinesX[i - 1] + gap;
-            funcLinesY[i] = Math.sin(Math.pow(funcLinesX[i],2));
+            funcLinesY[i] = Math.cos(funcLinesX[i]+Math.exp(Math.cos(funcLinesX[i])));
         }
         lineEntries1_lines = new ArrayList<Entry>();
         lineEntries1 = new ArrayList<Entry>();
@@ -95,11 +95,11 @@ public class Graphs extends AppCompatActivity {
         lineDataSet1.setHighlightEnabled(true);
         lineDataSet1.setLineWidth(2);
         lineDataSet1.setColor(Color.TRANSPARENT);
-        lineDataSet1.setCircleColor(Color.parseColor("#E10DC5"));
+        lineDataSet1.setCircleColor(Color.parseColor("#24056C"));
         lineDataSet1.setCircleRadius(6);
         lineDataSet1.setCircleHoleRadius(3);
         lineDataSet1.setDrawHighlightIndicators(true);
-        lineDataSet1.setHighLightColor(Color.parseColor("#E10DC5"));
+        lineDataSet1.setHighLightColor(Color.parseColor("#24056C"));
         lineDataSet1.setDrawValues(true);
         lineDataSet1.setValueTextSize(12);
         lineDataSet1.setValueTextColor(Color.DKGRAY);
@@ -109,9 +109,9 @@ public class Graphs extends AppCompatActivity {
         lineDataSet2.setHighlightEnabled(true);
         lineDataSet2.setLineWidth(2);
         lineDataSet2.setDrawCircles(false);
-        lineDataSet2.setColor(Color.parseColor("#E10DC5"));
+        lineDataSet2.setColor(Color.parseColor("#24056C"));
         lineDataSet2.disableDashedLine();
-        lineDataSet2.setHighLightColor(Color.parseColor("#E10DC5"));
+        lineDataSet2.setHighLightColor(Color.parseColor("#24056C"));
         lineDataSet2.setValueTextSize(12);
         lineDataSet2.setDrawValues(false);
         lineDataSet2.setValueTextColor(Color.DKGRAY);
@@ -202,7 +202,7 @@ public class Graphs extends AppCompatActivity {
         lineDataSet1.setCircleHoleRadius(3);
         lineDataSet1.setDrawHighlightIndicators(true);
         lineDataSet1.setDrawValues(false);
-        lineDataSet1.setHighLightColor(Color.parseColor("#E10DC5"));
+        lineDataSet1.setHighLightColor(Color.parseColor("#24056C"));
         lineDataSet1.setValueTextSize(12);
         lineDataSet1.setValueTextColor(Color.DKGRAY);
 
@@ -210,9 +210,9 @@ public class Graphs extends AppCompatActivity {
         lineDataSet2.setHighlightEnabled(true);
         lineDataSet2.setLineWidth(2);
         lineDataSet2.setDrawCircles(false);
-        lineDataSet2.setColor(Color.parseColor("#E10DC5"));
+        lineDataSet2.setColor(Color.parseColor("#24056C"));
         lineDataSet2.disableDashedLine();
-        lineDataSet2.setHighLightColor(Color.parseColor("#E10DC5"));
+        lineDataSet2.setHighLightColor(Color.parseColor("#24056C"));
         lineDataSet2.setValueTextSize(12);
         lineDataSet2.setDrawValues(false);
         lineDataSet2.setValueTextColor(Color.DKGRAY);
